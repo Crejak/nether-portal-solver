@@ -102,6 +102,14 @@ export class Vector implements Readonly<IVector> {
         );
     }
 
+    public times(scale: number): Vector {
+        return Vector.fromCoords(
+            this._x * scale,
+            this._y * scale,
+            this._z * scale
+        );
+    }
+
     public minus(other: Vector): Vector {
         return Vector.fromCoords(
             this._x - other._x,

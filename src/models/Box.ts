@@ -77,9 +77,9 @@ export class Box implements Readonly<IBox> {
     }
 
     public asBlockBox(): Box {
-        return Box.fromExtend(
+        return Box.fromCorners(
             this.lowestCorner.floored(),
-            this.extend.ceiled()
+            this.highestCorner.ceiled()
         );
     }
 
@@ -96,6 +96,10 @@ export class Box implements Readonly<IBox> {
             }
         }
         return result;
+    }
+
+    public center(): Vector {
+        return this._corner.plus(this._highestCorner).times(0.5);
     }
 
     public toString(): string {

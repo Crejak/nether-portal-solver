@@ -4,6 +4,7 @@ import PortalDefInput from "./PortalDefInput.vue";
 import {computed, ref, watch} from "vue";
 import {DimensionTravelType} from "../models/models.ts";
 import {oneBlockBox} from "../models/Box.ts";
+import Spoiler from "./Spoiler.vue";
 
 export interface Props {
   dimensionTravelType: DimensionTravelType,
@@ -42,7 +43,7 @@ watch(portal, () => {
       <PortalDefInput v-model="portalDef"></PortalDefInput>
     </div>
   </div>
-  <div>
+  <Spoiler>
     <div>
       Block box : {{ portal.blockBox.toString() }}
     </div>
@@ -61,7 +62,10 @@ watch(portal, () => {
     <div>
       Destination locations : {{ portal.destinationBlockPosList().toString() }}
     </div>
-  </div>
+    <div>
+      Ideal portal location : {{ portal.idealPortalLocation() }}
+    </div>
+  </Spoiler>
 </template>
 
 <style scoped>

@@ -99,6 +99,10 @@ export class Portal implements Readonly<IPortal> {
         return this.destinationBox().blockPosArray();
     }
 
+    public idealPortalLocation(): Vector {
+        return this.destinationBox().center().floored();
+    }
+
     public findClosestPortals(others: Array<Portal>): Array<Portal> {
         const destinationLocations = this.destinationBlockPosList();
 
