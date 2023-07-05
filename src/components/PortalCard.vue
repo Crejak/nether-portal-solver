@@ -2,7 +2,8 @@
 import {IPortal, Portal} from "../models/Portal.ts";
 import PortalDefInput from "./PortalDefInput.vue";
 import {computed, ref, watch} from "vue";
-import {DimensionTravelType, vector} from "../models/models.ts";
+import {DimensionTravelType} from "../models/models.ts";
+import {oneBlockBox} from "../models/Box.ts";
 
 export interface Props {
   dimensionTravelType: DimensionTravelType,
@@ -17,10 +18,7 @@ const emit = defineEmits<{
 
 const portalDef = ref<IPortal>({
   name: props.name,
-  blockBox: {
-    corner: vector(0, 0, 0),
-    extend: vector(1, 1, 1)
-  },
+  blockBox: oneBlockBox(),
   dimensionTravelType: props.dimensionTravelType,
   obstructNorth: false,
   obstructEast: false,
@@ -29,7 +27,7 @@ const portalDef = ref<IPortal>({
 });
 
 const portal = computed(() => {
-  return new Portal(portalDef.value);
+  return Portal.fromDef(portalDef.value);
 });
 
 watch(portal, () => {
@@ -46,13 +44,22 @@ watch(portal, () => {
   </div>
   <div>
     <div>
-      Block position list : {{ JSON.stringify(portal.blockPosList()) }}
+      Block box : {{ portal.blockBox.toString() }}
     </div>
     <div>
-      Player entry box : {{ JSON.stringify(portal.playerEntryBox()) }}
+      Block position list : {{ portal.blockPosList().toString() }}
     </div>
     <div>
-      Destination locations : {{ JSON.stringify(portal.destinationBlockPosList()) }}
+      Player entry box : {{ portal.playerEntryBox.toString() }}
+    </div>
+    <div>
+      Destination box : {{ portal.destinationBox().toString() }}
+    </div>
+    <div>
+      Destination block box : {{ portal.destinationBlockBox().toString() }}
+    </div>
+    <div>
+      Destination locations : {{ portal.destinationBlockPosList().toString() }}
     </div>
   </div>
 </template>
