@@ -53,6 +53,10 @@ export class Vector implements Readonly<IVector> {
         return ((a._x - b._x) * (a._x - b._x) + (a._y - b._y) * (a._y - b._y) + (a._z - b._z) * (a._z - b._z));
     }
 
+    public static horizontalMaxDistance(a: Vector, b: Vector): number {
+        return Math.max(Math.abs(a._x - b._x), Math.abs(a._z - b._z));
+    }
+
     get x(): number {
         return this._x;
     }

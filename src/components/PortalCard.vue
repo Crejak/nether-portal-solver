@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import {IPortal, Portal} from "../models/Portal.ts";
 import PortalDefInput from "./PortalDefInput.vue";
-import {computed, ref, watch} from "vue";
+import {computed, reactive, ref, watch} from "vue";
 import {DimensionTravelType} from "../models/models.ts";
 import {oneBlockBox} from "../models/Box.ts";
 import Spoiler from "./Spoiler.vue";
 
 export interface Props {
   dimensionTravelType: DimensionTravelType,
-  name: string
+  name: string,
+  portalKey: string,
+  allPortals: Map<string, Portal>
 }
 
 const props = defineProps<Props>();
@@ -27,6 +29,8 @@ const portalDef = ref<IPortal>({
   obstructWest: false
 });
 
+const linkedPortals = ref<Set<string>>(new Set<string>());
+
 const portal = computed(() => {
   return Portal.fromDef(portalDef.value);
 });
@@ -35,12 +39,23 @@ watch(portal, () => {
   emit('input', portal.value);
 });
 
+watch(props.allPortals, () => {
+  linkedPortals.value = portal.value.findClosestPortals(props.allPortals);
+});
+
 </script>
 
 <template>
   <div class="portal-card">
     <div>
       <PortalDefInput v-model="portalDef"></PortalDefInput>
+    </div>
+    <div>
+      <ul>
+        <li v-for="portalKey in linkedPortals">
+          {{ allPortals.get(portalKey)?.name }}
+        </li>
+      </ul>
     </div>
   </div>
   <Spoiler>

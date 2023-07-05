@@ -12,6 +12,15 @@ export function getDimensionTravelScale(dimensionTravelType: DimensionTravelType
     }
 }
 
+export function getDimensionTravelPortalSearchRadius(dimensionTravelType: DimensionTravelType): number {
+    switch (dimensionTravelType) {
+        case DimensionTravelType.NETHER_TO_OVERWORLD:
+            return 128;
+        case DimensionTravelType.OVERWORLD_TO_NETHER:
+            return 16;
+    }
+}
+
 export function round(n: number, decimal: number): number {
     const fac = Math.pow(10, decimal);
     return Math.round((n + Number.EPSILON) * fac) / fac;

@@ -1,28 +1,34 @@
 <script setup lang="ts">
 
-import {reactive, watch} from "vue";
+import {reactive, ref, watch} from "vue";
 import {Portal} from "../models/Portal";
 import {DimensionTravelType} from "../models/models";
 import PortalCard, {Props} from "./PortalCard.vue";
 
 const props = defineProps<{
-  dimensionTravelType: DimensionTravelType
+  dimensionTravelType: DimensionTravelType,
+  allPortals: Map<string, Portal>
 }>();
 
-const portalDefList = reactive<Array<Props>>([]);
-const portalMap = reactive<Map<number, Portal>>(new Map<number, Portal>());
+const emit = defineEmits<{
+  (e: 'input', portalMap: Map<string, Portal>): void
+}>();
 
-watch(portalDefList, () => {
-  console.log("defs", portalDefList);
-})
+const portalCardPropMap = reactive<Map<string, Props>>(new Map<string, Portal>());
+const portalMap = reactive<Map<string, Portal>>(new Map<string, Portal>());
+const incrementalId = ref<number>(0);
 
 watch(portalMap, () => {
-  console.log("portals", portalMap);
+  emit('input', portalMap);
 });
 
 function addPortalDef() {
-  portalDefList.push({
-    name: `Portal ${portalDefList.length}`,
+  const key = `Portal_${props.dimensionTravelType}_${incrementalId.value++}`;
+  const name = `Portal ${incrementalId.value}`;
+  portalCardPropMap.set(key, {
+    portalKey: key,
+    allPortals: props.allPortals,
+    name,
     dimensionTravelType: props.dimensionTravelType
   });
 }
@@ -32,10 +38,16 @@ function addPortalDef() {
 <template>
   <div>
     <div
-      v-for="[id, portalDef] in portalDefList.entries()"
-      :key="id"
+      v-for="[key, portalDef] in portalCardPropMap.entries()"
+      :key="key"
     >
-      <PortalCard :dimension-travel-type="dimensionTravelType" :name="portalDef.name" @input="portalMap.set(id, $event)"></PortalCard>
+      <PortalCard
+          :dimension-travel-type="dimensionTravelType"
+          :name="portalDef.name"
+          :portal-key="key"
+          :all-portals="allPortals"
+          @input="portalMap.set(key, $event)">
+      </PortalCard>
     </div>
     <button @click="addPortalDef">Add</button>
   </div>

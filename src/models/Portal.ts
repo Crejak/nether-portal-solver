@@ -1,4 +1,4 @@
-import {DimensionTravelType} from "./models.ts";
+import {DimensionTravelType, getDimensionTravelPortalSearchRadius} from "./models.ts";
 import {Box, IBox} from "./Box.ts";
 import {Vector} from "./Vector.ts";
 
@@ -103,28 +103,35 @@ export class Portal implements Readonly<IPortal> {
         return this.destinationBox().center().floored();
     }
 
-    public findClosestPortals(others: Array<Portal>): Array<Portal> {
+    public findClosestPortals<Key>(portalMap: Map<Key, Portal>): Set<Key> {
         const destinationLocations = this.destinationBlockPosList();
 
-        let resultMap = new Map<string, Portal>();
+        let resultSet = new Set<Key>();
 
         for (let destinationLocation of destinationLocations) {
             let minPortalDistance = Infinity;
-            let closestPortal: Portal = others[0];
-            for (let other of others) {
-                const otherDistance = other._blockBox.blockPosArray()
+            let closestPortalKey: Key | undefined = undefined;
+            for (let otherPortalKey of portalMap.keys()) {
+                const otherPortal = portalMap.get(otherPortalKey);
+                if (otherPortal === undefined || otherPortal.dimensionTravelType === this.dimensionTravelType) {
+                    continue;
+                }
+                const otherDistance = otherPortal
+                    .blockPosList()
+                    .filter(otherBlock => Vector.horizontalMaxDistance(destinationLocation, otherBlock) <= getDimensionTravelPortalSearchRadius(this._dimensionTravelType))
                     .map(otherBlock => Vector.squaredDistance(destinationLocation, otherBlock))
                     .sort((a, b) => a - b)
-                    [0];
-                if (otherDistance < minPortalDistance) {
+                    .find(_ => true);
+                if (otherDistance !== undefined && otherDistance < minPortalDistance) {
                     minPortalDistance = otherDistance;
-                    closestPortal = other;
+                    closestPortalKey = otherPortalKey;
                 }
             }
-            console.assert(closestPortal !== undefined);
-            resultMap.set(closestPortal._name, closestPortal);
+            if (closestPortalKey !== undefined) {
+                resultSet.add(closestPortalKey);
+            }
         }
 
-        return Array.from(resultMap.values());
+        return resultSet;
     }
 }
