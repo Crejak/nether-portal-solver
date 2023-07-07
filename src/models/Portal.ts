@@ -103,35 +103,120 @@ export class Portal implements Readonly<IPortal> {
         return this.destinationBox().center().floored();
     }
 
-    public findClosestPortals<Key>(portalMap: Map<Key, Portal>): Set<Key> {
+    public findClosestPortals<Key>(portalMap: Map<Key, Portal>): Array<PortalHit<Key>> {
         const destinationLocations = this.destinationBlockPosList();
 
-        let resultSet = new Set<Key>();
+        let result: Array<PortalHit<Key>> = [];
 
         for (let destinationLocation of destinationLocations) {
-            let minPortalDistance = Infinity;
-            let closestPortalKey: Key | undefined = undefined;
+            let potentialPortalHits: Array<IPortalHit<Key>> = [];
             for (let otherPortalKey of portalMap.keys()) {
                 const otherPortal = portalMap.get(otherPortalKey);
                 if (otherPortal === undefined || otherPortal.dimensionTravelType === this.dimensionTravelType) {
                     continue;
                 }
-                const otherDistance = otherPortal
+                const otherHit: IPortalBlockHit | undefined = otherPortal
                     .blockPosList()
                     .filter(otherBlock => Vector.horizontalMaxDistance(destinationLocation, otherBlock) <= getDimensionTravelPortalSearchRadius(this._dimensionTravelType))
-                    .map(otherBlock => Vector.squaredDistance(destinationLocation, otherBlock))
-                    .sort((a, b) => a - b)
-                    .find(_ => true);
-                if (otherDistance !== undefined && otherDistance < minPortalDistance) {
-                    minPortalDistance = otherDistance;
-                    closestPortalKey = otherPortalKey;
+                    .map(otherBlock => {
+                        return {
+                            squaredDistance: Vector.squaredDistance(destinationLocation, otherBlock),
+                            targetClosestBlockPos: otherBlock
+                        }
+                    })
+                    .sort(compareHits)
+                    .find(_ => true); //if multiple closest blocks, doesn't matter because it's the same portal
+                if (otherHit !== undefined) {
+                    potentialPortalHits.push({
+                        ...otherHit,
+                        source: this,
+                        targetKey: otherPortalKey,
+                        target: otherPortal,
+                        sourceClosestDestinationBlockPos: destinationLocation,
+                    });
                 }
             }
-            if (closestPortalKey !== undefined) {
-                resultSet.add(closestPortalKey);
+            if (potentialPortalHits.length > 0) {
+                const sortedPortalHits = potentialPortalHits.sort(compareHits);
+                const closest = potentialPortalHits[0];
+                sortedPortalHits
+                    .filter(hit => compareHits(closest, hit) === 0)
+                    .forEach(closestHit => {
+                        result.push(PortalHit.fromDef(closestHit));
+                    });
             }
         }
 
-        return resultSet;
+        return result;
+    }
+}
+
+export interface IPortalBlockHit {
+    targetClosestBlockPos: Vector;
+    squaredDistance: number;
+}
+
+function compareHits(a: IPortalBlockHit, b: IPortalBlockHit): number {
+    const diff = a.squaredDistance - b.squaredDistance;
+    if (diff !== 0) {
+        return diff;
+    }
+    return a.targetClosestBlockPos.y - b.targetClosestBlockPos.y
+}
+
+export interface IPortalHit<Key> extends IPortalBlockHit {
+    source: Portal;
+    targetKey: Key;
+    target: Portal;
+    sourceClosestDestinationBlockPos: Vector;
+}
+
+export class PortalHit<Key> implements Readonly<IPortalHit<Key>> {
+    private readonly _source: Portal;
+    private readonly _targetKey: Key;
+    private readonly _target: Portal;
+    private readonly _sourceClosestDestinationBlockPos: Vector;
+    private readonly _targetClosestBlockPos: Vector;
+    private readonly _squaredDistance: number;
+
+    private constructor(def: Readonly<IPortalHit<Key>>) {
+        this._source = def.source;
+        this._targetKey = def.targetKey;
+        this._target = def.target;
+        this._sourceClosestDestinationBlockPos = def.sourceClosestDestinationBlockPos;
+        this._targetClosestBlockPos = def.targetClosestBlockPos;
+        this._squaredDistance = def.squaredDistance;
+    }
+
+    public static fromDef<Key>(def: Readonly<IPortalHit<Key>>): PortalHit<Key> {
+        return new PortalHit(def);
+    }
+
+    public get source(): Portal {
+        return this._source;
+    }
+
+    public get targetKey(): Key {
+        return this._targetKey;
+    }
+
+    public get target(): Portal {
+        return this._target;
+    }
+
+    public get sourceClosestDestinationBlockPos(): Vector {
+        return this._sourceClosestDestinationBlockPos;
+    }
+
+    public get targetClosestBlockPos(): Vector {
+        return this._targetClosestBlockPos;
+    }
+
+    public get squaredDistance(): number {
+        return this._squaredDistance;
+    }
+
+    public toString(): string {
+        return `From [${this.source.name}] to [${this.target.name}]@${this.targetKey} via ${this.sourceClosestDestinationBlockPos} -> ${this.targetClosestBlockPos} (dist: ${this.squaredDistance})`
     }
 }

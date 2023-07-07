@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {IPortal, Portal} from "../models/Portal.ts";
+import {IPortal, Portal, PortalHit} from "../models/Portal.ts";
 import PortalDefInput from "./PortalDefInput.vue";
-import {computed, reactive, ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import {DimensionTravelType} from "../models/models.ts";
 import {oneBlockBox} from "../models/Box.ts";
 import Spoiler from "./Spoiler.vue";
@@ -29,7 +29,7 @@ const portalDef = ref<IPortal>({
   obstructWest: false
 });
 
-const linkedPortals = ref<Set<string>>(new Set<string>());
+const hits = ref<Array<PortalHit<string>>>([]);
 
 const portal = computed(() => {
   return Portal.fromDef(portalDef.value);
@@ -40,7 +40,7 @@ watch(portal, () => {
 });
 
 watch(props.allPortals, () => {
-  linkedPortals.value = portal.value.findClosestPortals(props.allPortals);
+  hits.value = portal.value.findClosestPortals(props.allPortals);
 });
 
 </script>
@@ -52,8 +52,8 @@ watch(props.allPortals, () => {
     </div>
     <div>
       <ul>
-        <li v-for="portalKey in linkedPortals">
-          {{ allPortals.get(portalKey)?.name }}
+        <li v-for="hit in hits">
+          {{ hit }}
         </li>
       </ul>
     </div>
