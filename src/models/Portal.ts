@@ -1,6 +1,6 @@
-import {DimensionTravelType, getDimensionTravelPortalSearchRadius} from "./models.ts";
+import {DimensionTravelType, getDimensionTravelPortalSearchRadius, opposite} from "./models.ts";
 import {Box, IBox} from "./Box.ts";
-import {Vector} from "./Vector.ts";
+import {oneVector, Vector} from "./Vector.ts";
 
 export interface IPortal {
     name: string;
@@ -101,6 +101,12 @@ export class Portal implements Readonly<IPortal> {
 
     public idealPortalLocation(): Vector {
         return this.destinationBox().center().floored();
+    }
+
+    public invertDestinationBlockPos(blockPos: Vector): Box {
+        return Box.fromExtend(blockPos, oneVector())
+            .scaled(opposite(this.dimensionTravelType))
+            .clamped(this.playerEntryBox);
     }
 
     public findClosestPortals<Key>(portalMap: Map<Key, Portal>): Array<PortalHit<Key>> {

@@ -14,7 +14,7 @@ const emit = defineEmits<{
   (e: 'input', portalMap: Map<string, Portal>): void
 }>();
 
-const portalCardPropMap = reactive<Map<string, Props>>(new Map<string, Portal>());
+const portalCardPropMap = reactive<Map<string, Props>>(new Map<string, Props>());
 const portalMap = reactive<Map<string, Portal>>(new Map<string, Portal>());
 const incrementalId = ref<number>(0);
 

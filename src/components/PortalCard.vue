@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import {IPortal, Portal, PortalHit} from "../models/Portal.ts";
+import {IPortal, Portal} from "../models/Portal.ts";
 import PortalDefInput from "./PortalDefInput.vue";
 import {computed, ref, watch} from "vue";
 import {DimensionTravelType} from "../models/models.ts";
 import {oneBlockBox} from "../models/Box.ts";
 import Spoiler from "./Spoiler.vue";
+import {Analyzer, hitInfoToString} from "../models/Analyzer.ts";
 
 export interface Props {
   dimensionTravelType: DimensionTravelType,
@@ -29,7 +30,7 @@ const portalDef = ref<IPortal>({
   obstructWest: false
 });
 
-const hits = ref<Array<PortalHit<string>>>([]);
+const hitInfos = ref<Analyzer<string>>(Analyzer.empty<string>());
 
 const portal = computed(() => {
   return Portal.fromDef(portalDef.value);
@@ -40,7 +41,7 @@ watch(portal, () => {
 });
 
 watch(props.allPortals, () => {
-  hits.value = portal.value.findClosestPortals(props.allPortals);
+  hitInfos.value = Analyzer.analyze(props.allPortals, props.portalKey);
 });
 
 </script>
@@ -52,8 +53,8 @@ watch(props.allPortals, () => {
     </div>
     <div>
       <ul>
-        <li v-for="hit in hits">
-          {{ hit }}
+        <li v-for="hit in hitInfos.hitInfos()">
+          {{ hitInfoToString(hit) }}
         </li>
       </ul>
     </div>

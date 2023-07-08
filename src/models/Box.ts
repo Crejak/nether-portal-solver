@@ -70,6 +70,13 @@ export class Box implements Readonly<IBox> {
         );
     }
 
+    public clamped(border: Box): Box {
+        return Box.fromCorners(
+            this.corner.clamped(border),
+            this.highestCorner.clamped(border)
+        );
+    }
+
     public isBlockBox(): boolean {
         return this._corner.isDiscrete()
             && this._extend.isDiscrete()

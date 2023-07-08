@@ -3,6 +3,15 @@ export enum DimensionTravelType {
     NETHER_TO_OVERWORLD
 }
 
+export function opposite(dimensionTravelType: DimensionTravelType): DimensionTravelType {
+    switch (dimensionTravelType) {
+        case DimensionTravelType.NETHER_TO_OVERWORLD:
+            return DimensionTravelType.OVERWORLD_TO_NETHER;
+        case DimensionTravelType.OVERWORLD_TO_NETHER:
+            return DimensionTravelType.NETHER_TO_OVERWORLD;
+    }
+}
+
 export function getDimensionTravelScale(dimensionTravelType: DimensionTravelType): number {
     switch (dimensionTravelType) {
         case DimensionTravelType.NETHER_TO_OVERWORLD:

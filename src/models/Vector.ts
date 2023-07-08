@@ -1,4 +1,5 @@
 import {DimensionTravelType, getDimensionTravelScale, round} from "./models.ts";
+import {Box} from "./Box.ts";
 
 export interface IVector {
     x: number,
@@ -39,6 +40,16 @@ export class Vector implements Readonly<IVector> {
 
     public static fromCoords(x: number, y: number, z: number): Vector {
         return new Vector(x, y, z);
+    }
+
+    public static fromHash(hash: string): Vector {
+        const defJson = JSON.parse(hash);
+        if (typeof defJson.x !== "number"
+            || typeof defJson.y !== "number"
+            || typeof defJson.z !== "number") {
+            throw new Error(`Cannot read Vector from hash : ${hash}`);
+        }
+        return new Vector(defJson.x, defJson.y, defJson.z);
     }
 
     public static apply(fn: (a: number, b: number) => number, a: Vector, b: Vector): Vector {
@@ -106,6 +117,14 @@ export class Vector implements Readonly<IVector> {
         );
     }
 
+    public clamped(border: Box): Vector {
+        return Vector.fromCoords(
+            clamp(this.x, border.corner.x, border.highestCorner.x),
+            clamp(this.y, border.corner.y, border.highestCorner.y),
+            clamp(this.z, border.corner.z, border.highestCorner.z)
+        );
+    }
+
     public times(scale: number): Vector {
         return Vector.fromCoords(
             this._x * scale,
@@ -133,4 +152,16 @@ export class Vector implements Readonly<IVector> {
     public toString(): string {
         return `(${round(this._x, 6)}; ${round(this._y, 6)}; ${round(this._z, 6)})`;
     }
+
+    public hash(): string {
+        return JSON.stringify({
+            x: this.x,
+            y: this.y,
+            z: this.z
+        });
+    }
+}
+
+function clamp(toClamp: number, min: number, max: number): number {
+    return Math.min(Math.max(toClamp, min), max);
 }
