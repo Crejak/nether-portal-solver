@@ -56,10 +56,15 @@ function onRemoveClicked() {
   <div class="card">
     <button class="top-left-button" @click="onRemoveClicked">Remove</button>
     <PortalDefInput v-model="portalDef"></PortalDefInput>
+    <Spoiler :show="true" title="Results">
     <div>
+      <label class="line-label label-above">Ideal portal location</label>
+      <div class="info">
+        {{ portal.idealPortalLocation() }}
+      </div>
       <label class="line-label label-above">Destinations</label>
       <ul class="line">
-        <li v-for="result in analyzer.allPortalResults" class="info">
+        <li class="info" v-for="result in analyzer.allPortalResults">
           <span v-if="result.length === 0">
             A new portal will be created
           </span>
@@ -72,35 +77,39 @@ function onRemoveClicked() {
         </li>
       </ul>
     </div>
-    <Spoiler>
-      <ul>
-        <li v-for="hit in analyzer.hitInfos()">
+    </Spoiler>
+    <Spoiler title="(Technical) all hit infos">
+      <ul class="line">
+        <li class="info" v-for="hit in analyzer.hitInfos()">
           {{ hitInfoToString(hit) }}
         </li>
       </ul>
     </Spoiler>
-    <Spoiler>
-      <div>
-        Block box : {{ portal.blockBox.toString() }}
-      </div>
-      <div>
-        Block position list : {{ portal.blockPosList().toString() }}
-      </div>
-      <div>
-        Player entry box : {{ portal.playerEntryBox.toString() }}
-      </div>
-      <div>
-        Destination box : {{ portal.destinationBox().toString() }}
-      </div>
-      <div>
-        Destination block box : {{ portal.destinationBlockBox().toString() }}
-      </div>
-      <div>
-        Destination locations : {{ portal.destinationBlockPosList().toString() }}
-      </div>
-      <div>
-        Ideal portal location : {{ portal.idealPortalLocation() }}
-      </div>
+    <Spoiler title="(Technical) computed portal details">
+        <label class="label-above line-label">Block box</label>
+        <div class="info">
+          {{ portal.blockBox.toString() }}
+        </div>
+        <label class="label-above line-label">Block position list</label>
+        <div class="info">
+          {{ portal.blockPosList().toString() }}
+        </div>
+        <label class="label-above line-label">Player entry box</label>
+        <div class="info">
+          {{ portal.playerEntryBox.toString() }}
+        </div>
+        <label class="label-above line-label">Destination box</label>
+        <div class="info">
+          {{ portal.destinationBox().toString() }}
+        </div>
+        <label class="label-above line-label">Destination block box</label>
+        <div class="info">
+          {{ portal.destinationBlockBox().toString() }}
+        </div>
+        <label class="label-above line-label">Destination locations</label>
+        <div class="info">
+          {{ portal.destinationBlockPosList().toString() }}
+        </div>
     </Spoiler>
   </div>
 </template>

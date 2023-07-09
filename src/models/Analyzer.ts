@@ -9,7 +9,7 @@ export interface ISourceBlockPosHitInfo<Key> {
 }
 
 export function hitInfoToString(hitInfo: ISourceBlockPosHitInfo<any>): string {
-    return `From ${hitInfo.sourcePlayerEntryBox} -> ${hitInfo.hits.length} portal(s) : ${hitInfo.hits.map(hit => hit.target.name)}`;
+    return `${hitInfo.sourcePlayerEntryBox} > ${hitInfo.hits.map(hit => `"${hit.target.name}"`).join("; ")} (${hitInfo.hits.length})`;
 }
 
 export class Analyzer<Key> {
