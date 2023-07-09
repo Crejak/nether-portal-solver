@@ -33,24 +33,28 @@ function addPortalDef() {
   });
 }
 
+function removePortal(key: string) {
+  portalCardPropMap.delete(key)
+  portalMap.delete(key);
+}
 </script>
 
 <template>
-  <div>
-    <div
+  <div
       v-for="[key, portalDef] in portalCardPropMap.entries()"
       :key="key"
+  >
+    <PortalCard
+        :dimension-travel-type="dimensionTravelType"
+        :name="portalDef.name"
+        :portal-key="key"
+        :all-portals="allPortals"
+        @input="portalMap.set(key, $event)"
+        @remove="removePortal"
     >
-      <PortalCard
-          :dimension-travel-type="dimensionTravelType"
-          :name="portalDef.name"
-          :portal-key="key"
-          :all-portals="allPortals"
-          @input="portalMap.set(key, $event)">
-      </PortalCard>
-    </div>
-    <button @click="addPortalDef">Add</button>
+    </PortalCard>
   </div>
+  <button @click="addPortalDef">Add</button>
 </template>
 
 <style scoped>

@@ -17,7 +17,8 @@ export interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  (e: 'input', portal: Portal): void
+  (e: 'input', portal: Portal): void,
+  (e: 'remove', key: string): void
 }>();
 
 const portalDef = ref<IPortal>({
@@ -44,46 +45,54 @@ watch(props.allPortals, () => {
   hitInfos.value = Analyzer.analyze(props.allPortals, props.portalKey);
 });
 
+function onRemoveClicked() {
+  emit('remove', props.portalKey);
+}
+
 </script>
 
 <template>
-  <div class="portal-card">
-    <div>
-      <PortalDefInput v-model="portalDef"></PortalDefInput>
-    </div>
-    <div>
+  <div class="card">
+    <button class="top-left-button" @click="onRemoveClicked">Remove</button>
+    <PortalDefInput v-model="portalDef"></PortalDefInput>
+    <Spoiler>
       <ul>
         <li v-for="hit in hitInfos.hitInfos()">
           {{ hitInfoToString(hit) }}
         </li>
       </ul>
-    </div>
+    </Spoiler>
+    <Spoiler>
+      <div>
+        Block box : {{ portal.blockBox.toString() }}
+      </div>
+      <div>
+        Block position list : {{ portal.blockPosList().toString() }}
+      </div>
+      <div>
+        Player entry box : {{ portal.playerEntryBox.toString() }}
+      </div>
+      <div>
+        Destination box : {{ portal.destinationBox().toString() }}
+      </div>
+      <div>
+        Destination block box : {{ portal.destinationBlockBox().toString() }}
+      </div>
+      <div>
+        Destination locations : {{ portal.destinationBlockPosList().toString() }}
+      </div>
+      <div>
+        Ideal portal location : {{ portal.idealPortalLocation() }}
+      </div>
+    </Spoiler>
   </div>
-  <Spoiler>
-    <div>
-      Block box : {{ portal.blockBox.toString() }}
-    </div>
-    <div>
-      Block position list : {{ portal.blockPosList().toString() }}
-    </div>
-    <div>
-      Player entry box : {{ portal.playerEntryBox.toString() }}
-    </div>
-    <div>
-      Destination box : {{ portal.destinationBox().toString() }}
-    </div>
-    <div>
-      Destination block box : {{ portal.destinationBlockBox().toString() }}
-    </div>
-    <div>
-      Destination locations : {{ portal.destinationBlockPosList().toString() }}
-    </div>
-    <div>
-      Ideal portal location : {{ portal.idealPortalLocation() }}
-    </div>
-  </Spoiler>
 </template>
 
 <style scoped>
-
+.top-left-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: inherit;
+}
 </style>
