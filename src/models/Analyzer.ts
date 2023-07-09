@@ -56,7 +56,7 @@ export class Analyzer<Key> {
     }
 
     public static empty<Key>() {
-        return new Analyzer<Key>(new Map<string, ISourceBlockPosHitInfo<Key>>());
+        return new Analyzer<Key>(new Map<string, ISourceBlockPosHitInfo<Key>>(), []);
     }
 
     public hitInfos(): IterableIterator<ISourceBlockPosHitInfo<Key>> {
