@@ -56,7 +56,7 @@ function onRemoveClicked() {
   <div class="card">
     <button class="top-left-button" @click="onRemoveClicked">Remove</button>
     <PortalDefInput v-model="portalDef"></PortalDefInput>
-    <Spoiler :show="true" title="Results">
+    <Spoiler :show="true" title="Analyze">
     <div>
       <label class="line-label label-above">Ideal portal location</label>
       <div class="info">

@@ -36,7 +36,7 @@ onMounted(() => {
   <h3 class="local-title line">
     <input class="title-input" type="text" v-model="portal.name" @input="emitPortal">
   </h3>
-  <Spoiler :show="true" title="Details">
+  <Spoiler :show="true" title="Definition">
     <div class="line">
       <label class="line-label label-above">Corner position</label>
       <VectorInput v-model="portal.blockBox.corner" @update:modelValue="emitPortal"></VectorInput>

@@ -23,8 +23,11 @@ watch(portalMap, () => {
 });
 
 function addPortalDef() {
-  const key = `Portal_${props.dimensionTravelType}_${incrementalId.value++}`;
-  const name = `Portal ${incrementalId.value}`;
+  const dimensionName = props.dimensionTravelType === DimensionTravelType.NETHER_TO_OVERWORLD
+    ? "Nether"
+    : "Overworld";
+  const key = `${dimensionName}_${incrementalId.value++}`;
+  const name = `${dimensionName} ${incrementalId.value}`;
   portalCardPropMap.set(key, {
     portalKey: key,
     allPortals: props.allPortals,
@@ -54,9 +57,13 @@ function removePortal(key: string) {
     >
     </PortalCard>
   </div>
-  <button @click="addPortalDef">Add</button>
+  <div class="columns centered">
+    <button class="add-button" @click="addPortalDef">Add</button>
+  </div>
 </template>
 
 <style scoped>
+.add-button {
 
+}
 </style>
