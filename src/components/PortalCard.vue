@@ -31,7 +31,7 @@ const portalDef = ref<IPortal>({
   obstructWest: false
 });
 
-const hitInfos = ref<Analyzer<string>>(Analyzer.empty<string>());
+const analyzer = ref<Analyzer<string>>(Analyzer.empty<string>());
 
 const portal = computed(() => {
   return Portal.fromDef(portalDef.value);
@@ -42,7 +42,8 @@ watch(portal, () => {
 });
 
 watch(props.allPortals, () => {
-  hitInfos.value = Analyzer.analyze(props.allPortals, props.portalKey);
+  console.log("update analyzer");
+  analyzer.value = Analyzer.analyze(props.allPortals, props.portalKey);
 });
 
 function onRemoveClicked() {
@@ -55,9 +56,25 @@ function onRemoveClicked() {
   <div class="card">
     <button class="top-left-button" @click="onRemoveClicked">Remove</button>
     <PortalDefInput v-model="portalDef"></PortalDefInput>
+    <div>
+      <label class="line-label label-above">Destinations</label>
+      <ul class="line">
+        <li v-for="result in analyzer.allPortalResults" class="info">
+          <span v-if="result.length === 0">
+            A new portal will be created
+          </span>
+          <span v-else-if="result.length === 1">
+            "{{ allPortals.get(result[0])?.name }}"
+          </span>
+          <span v-else>
+            {{ result.map(key => `"${allPortals.get(key)?.name}"`)?.join(", ") }} (undetermined)
+          </span>
+        </li>
+      </ul>
+    </div>
     <Spoiler>
       <ul>
-        <li v-for="hit in hitInfos.hitInfos()">
+        <li v-for="hit in analyzer.hitInfos()">
           {{ hitInfoToString(hit) }}
         </li>
       </ul>

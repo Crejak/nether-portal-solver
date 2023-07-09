@@ -79,7 +79,7 @@ onMounted(() => {
 
 .title-input {
   text-align: center;
-  font-size: medium;
+  font-size: large;
 }
 
 .bottom-grid {

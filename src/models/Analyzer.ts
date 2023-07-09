@@ -14,9 +14,11 @@ export function hitInfoToString(hitInfo: ISourceBlockPosHitInfo<any>): string {
 
 export class Analyzer<Key> {
     private readonly _sourceDestinationPosToHitInfo: Map<string, ISourceBlockPosHitInfo<Key>>;
+    private readonly _allPortalResults: Array<Array<Key>>;
 
-    private constructor(sourceDestinationPosToHitInfo: Map<string, ISourceBlockPosHitInfo<Key>>) {
+    private constructor(sourceDestinationPosToHitInfo: Map<string, ISourceBlockPosHitInfo<Key>>, allPortalResults: Array<Array<Key>>) {
         this._sourceDestinationPosToHitInfo = sourceDestinationPosToHitInfo;
+        this._allPortalResults = allPortalResults;
     }
 
     public static analyze<Key>(portalMap: Map<Key, Portal>, sourceKey: Key): Analyzer<Key> {
@@ -42,7 +44,15 @@ export class Analyzer<Key> {
                 ?.push(hit);
         }
 
-        return new Analyzer<Key>(hashMap);
+        let resultHashSet: Set<string> = new Set<string>();
+        for (const hitInfo of hashMap.values()) {
+            const hitKeys = hitInfo.hits.map(hit => hit.targetKey);
+            resultHashSet.add(hashKeyArray(hitKeys));
+        }
+        let allPortalResults: Array<Array<Key>> = [];
+        resultHashSet.forEach(hash => allPortalResults.push(unhashKeyArray(hash)));
+
+        return new Analyzer<Key>(hashMap, allPortalResults);
     }
 
     public static empty<Key>() {
@@ -52,4 +62,16 @@ export class Analyzer<Key> {
     public hitInfos(): IterableIterator<ISourceBlockPosHitInfo<Key>> {
         return this._sourceDestinationPosToHitInfo.values();
     }
+
+    public get allPortalResults(): Array<Array<Key>> {
+        return this._allPortalResults;
+    }
+}
+
+function hashKeyArray<Key>(keyArray: Array<Key>): string {
+    return JSON.stringify(keyArray.sort());
+}
+
+function unhashKeyArray<Key>(hash: string): Array<Key> {
+    return JSON.parse(hash);
 }
